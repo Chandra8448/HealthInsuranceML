@@ -1,0 +1,16 @@
+{
+  "model": "Gradient Boosting",
+  "r2": 0.88,
+  "mae": 2393.0,
+  "rmse": 4315.0,
+  "importances": {
+    "smoker": 1.398,
+    "bmi": 0.2498,
+    "age": 0.1868,
+    "children": 0.015,
+    "region": 0.0041,
+    "sex": -0.0013
+  },
+  "rows": 1338,
+  "sklearn_version": "1.6.1"
+}

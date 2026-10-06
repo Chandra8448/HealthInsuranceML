@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - HealthInsure ML{% endblock %}
+{% block content %}
+<div class="stats">
+  <div class="stat"><span>Model</span><b style="font-size:18px">{{ metrics.model }}</b></div>
+  <div class="stat"><span>R² score</span><b>{{ metrics.r2 if metrics.r2 is not none else '—' }}</b></div>
+  <div class="stat"><span>MAE ($)</span><b>{{ metrics.mae if metrics.mae is not none else '—' }}</b></div>
+  <div class="stat"><span>Your predictions</span><b>{{ history|length }}</b></div>
+</div>
+
+<div class="card">
+  <h2>Your recent premium predictions</h2>
+  {% if history %}
+    <canvas id="chart" height="110"></canvas>
+  {% else %}
+    <p class="muted">No predictions yet. <a href="{{ url_for('predict') }}">Make your first one</a>.</p>
+  {% endif %}
+</div>
+
+{% if metrics.importances %}
+<div class="card">
+  <h2>What drives the premium (feature importance)</h2>
+  <canvas id="imp" height="90"></canvas>
+</div>
+{% endif %}
+
+{% if history %}
+<div class="card">
+  <h2>History</h2>
+  <table>
+    <tr><th>#</th><th>Age</th><th>Sex</th><th>BMI</th><th>Children</th><th>Smoker</th><th>Region</th><th>Premium</th><th>Date</th></tr>
+    {% for h in history %}
+    <tr><td>{{ h.id }}</td><td>{{ h.age }}</td><td>{{ h.sex }}</td><td>{{ h.bmi }}</td><td>{{ h.children }}</td>
+        <td>{{ h.smoker }}</td><td>{{ h.region }}</td><td>${{ '{:,.0f}'.format(h.premium) }}</td><td>{{ h.created_at }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+{% if history %}
+new Chart(document.getElementById('chart'), {
+  type: 'line',
+  data: { labels: {{ chart_labels|tojson }}, datasets: [{ label: 'Premium ($)', data: {{ chart_values|tojson }},
+          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.12)', fill: true, tension: .3 }] }
+});
+{% endif %}
+{% if metrics.importances %}
+new Chart(document.getElementById('imp'), {
+  type: 'bar',
+  data: { labels: {{ metrics.importances.keys()|list|tojson }}, datasets: [{ label: 'Importance', data: {{ metrics.importances.values()|list|tojson }}, backgroundColor: '#2563eb' }] },
+  options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+});
+{% endif %}
+</script>
+{% endblock %}
