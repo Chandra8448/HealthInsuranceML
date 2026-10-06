@@ -3,4 +3,4 @@ gunicorn>=22.0
 pandas>=2.0
 numpy>=1.26
 joblib>=1.3
-scikit-learn==X.Y.Z
+scikit-learn==1.6.1
